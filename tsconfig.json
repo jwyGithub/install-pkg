@@ -1,0 +1,7 @@
+{
+    "extends": "@jiangweiye/tsconfig/tsconfig.node.json",
+    "compilerOptions": {
+        "composite": false
+    },
+    "exclude": ["node_modules", "dist", "./*.js"]
+}
