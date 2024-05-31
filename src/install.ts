@@ -2,6 +2,7 @@ import { existsSync } from 'node:fs';
 import process from 'node:process';
 import { resolve } from 'node:path';
 import { async as ezspawn } from '@jsdevtools/ez-spawn';
+
 import { detectPackageManager } from './detect';
 
 export interface InstallPackageOptions {
