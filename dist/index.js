@@ -110,15 +110,15 @@ function pLimit(concurrency) {
   }), "generator");
   Object.defineProperties(generator, {
     activeCount: {
-      get: () => activeCount
+      get: /* @__PURE__ */ __name(() => activeCount, "get")
     },
     pendingCount: {
-      get: () => queue.size
+      get: /* @__PURE__ */ __name(() => queue.size, "get")
     },
     clearQueue: {
-      value: () => {
+      value: /* @__PURE__ */ __name(() => {
         queue.clear();
-      }
+      }, "value")
     }
   });
   return generator;
@@ -275,31 +275,24 @@ async function detectPackageManager(cwd = process2.cwd()) {
     cwd
   });
   let packageJsonPath;
-  if (lockPath)
-    packageJsonPath = path3.resolve(lockPath, "../package.json");
-  else
-    packageJsonPath = await findUp("package.json", {
-      cwd
-    });
+  if (lockPath) packageJsonPath = path3.resolve(lockPath, "../package.json");
+  else packageJsonPath = await findUp("package.json", {
+    cwd
+  });
   if (packageJsonPath && fs2.existsSync(packageJsonPath)) {
     try {
       const pkg = JSON.parse(fs2.readFileSync(packageJsonPath, "utf8"));
       if (typeof pkg.packageManager === "string") {
         const [name, version] = pkg.packageManager.split("@");
-        if (name === "yarn" && Number.parseInt(version) > 1)
-          agent = "yarn@berry";
-        else if (name === "pnpm" && Number.parseInt(version) < 7)
-          agent = "pnpm@6";
-        else if (AGENTS.includes(name))
-          agent = name;
-        else
-          console.warn("[ni] Unknown packageManager:", pkg.packageManager);
+        if (name === "yarn" && Number.parseInt(version) > 1) agent = "yarn@berry";
+        else if (name === "pnpm" && Number.parseInt(version) < 7) agent = "pnpm@6";
+        else if (AGENTS.includes(name)) agent = name;
+        else console.warn("[ni] Unknown packageManager:", pkg.packageManager);
       }
     } catch {
     }
   }
-  if (!agent && lockPath)
-    agent = LOCKS[path3.basename(lockPath)];
+  if (!agent && lockPath) agent = LOCKS[path3.basename(lockPath)];
   return agent;
 }
 __name(detectPackageManager, "detectPackageManager");
@@ -312,19 +305,15 @@ import { async as ezspawn } from "@jsdevtools/ez-spawn";
 async function installPackage(names, options = {}) {
   const detectedAgent = options.packageManager || await detectPackageManager(options.cwd) || "npm";
   const [agent] = detectedAgent.split("@");
-  if (!Array.isArray(names))
-    names = [
-      names
-    ];
+  if (!Array.isArray(names)) names = [
+    names
+  ];
   const args = options.additionalArgs || [];
   if (options.preferOffline) {
-    if (detectedAgent === "yarn@berry")
-      args.unshift("--cached");
-    else
-      args.unshift("--prefer-offline");
+    if (detectedAgent === "yarn@berry") args.unshift("--cached");
+    else args.unshift("--prefer-offline");
   }
-  if (agent === "pnpm" && existsSync(resolve(options.cwd ?? process3.cwd(), "pnpm-workspace.yaml")))
-    args.unshift("-w");
+  if (agent === "pnpm" && existsSync(resolve(options.cwd ?? process3.cwd(), "pnpm-workspace.yaml"))) args.unshift("-w");
   return ezspawn(agent, [
     agent === "yarn" ? "add" : "install",
     options.dev ? "-D" : "",
